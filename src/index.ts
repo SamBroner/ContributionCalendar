@@ -7,6 +7,7 @@ export type {
   Habit,
   Theme,
   ShapeType,
+  DateRangeType,
   HabitCalendarProps,
   DayCellProps
 } from './types'; 

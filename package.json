@@ -2,13 +2,16 @@
   "name": "habit-contribution-calendar",
   "version": "1.0.0",
   "description": "A customizable React component that visualizes multi-habit tracking in a GitHub-like contribution calendar style",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "jest",
     "lint": "eslint src --ext .ts,.tsx",
+    "demo": "npm install && npm run build && cd demo && npm install && npm run dev",
     "prepare": "npm run build"
   },
   "files": [

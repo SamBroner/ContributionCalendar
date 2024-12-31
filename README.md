@@ -1,6 +1,6 @@
 # Habit Contribution Calendar
 
-A customizable React component that visualizes multi-habit tracking in a GitHub-like contribution calendar style. Instead of traditional squares, each day is represented by an n-sided shape split into segments, where each segment represents a different habit's contribution.
+A customizable React component that visualizes multi-habit tracking in a GitHub-like contribution calendar style. Instead of traditional squares, each day is represented by an n-sided shape split into slices, where each segment represents a different habit's contribution.
 
 ## Features
 
@@ -73,6 +73,18 @@ const MyHabitTracker = () => {
 | size | number | 16 | Size of each day cell in pixels |
 | gap | number | 2 | Gap between cells in pixels |
 | theme | Theme | defaultTheme | Theme configuration object |
+
+## Shape Rules
+
+The calendar uses different shapes and segmentation rules based on the number of active habits:
+
+1. **Single Habit**: A simple square cell, filled with the habit's color.
+2. **Two Habits**: A square cell split diagonally from top-right to bottom-left, creating two triangular segments.
+3. **Three Habits**: A hexagonal cell divided into three equal segments.
+4. **Four Habits**: A square cell subdivided into four equal smaller squares.
+5. **Five or More Habits**: A pentagonal cell divided into n equal radial segments, where n is the number of habits.
+
+Each segment's color intensity represents the relative value of that habit's contribution for the day.
 
 ### Habit Configuration
 

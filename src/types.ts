@@ -30,10 +30,12 @@ export interface Theme {
 
 export type ShapeType = 'triangle' | 'square' | 'hexagon' | 'octagon';
 
+export type DateRangeType = 'calendar-year' | 'trailing-12-months';
+
 export interface HabitCalendarProps {
   habits: Habit[];
-  startDate?: string;
-  endDate?: string;
+  dateRangeType?: DateRangeType;
+  year?: number; // Only used when dateRangeType is 'calendar-year'
   shape?: ShapeType;
   size?: number;
   gap?: number;
@@ -53,11 +55,11 @@ export interface DayCellProps {
 
 export const defaultTheme: Theme = {
   background: '#ffffff',
-  text: '#24292e',
+  text: '#57606a',
   tooltip: {
     background: '#ffffff',
-    text: '#24292e',
-    border: '#e1e4e8'
+    text: '#24292f',
+    border: '#d0d7de'
   },
   empty: '#ebedf0'
 }; 
