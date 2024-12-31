@@ -104,13 +104,11 @@ const createBlobUrl = (content: string) => {
 };
 
 const App: React.FC = () => {
-  const [shape, setShape] = useState<'triangle' | 'square' | 'hexagon' | 'octagon'>('hexagon');
   const [size, setSize] = useState(10);
   const [dateRangeType, setDateRangeType] = useState<DateRangeType>('calendar-year');
   const [year, setYear] = useState(new Date().getFullYear());
-  const [activeHabits, setActiveHabits] = useState<string[]>(['Running', 'Writing', 'Meditation', 'Reading', 'Coding']);
 
-  const allHabits = [
+  const habits = [
     {
       name: 'Running',
       dataSource: new CSVAdapter({
@@ -118,7 +116,7 @@ const App: React.FC = () => {
         dateColumn: 'date',
         valueColumn: 'distance'
       }),
-      color: '#39d353'
+      color: 'green'
     },
     {
       name: 'Writing',
@@ -127,7 +125,7 @@ const App: React.FC = () => {
         dateColumn: 'date',
         valueColumn: 'words'
       }),
-      color: '#0969da'
+      color: 'blue'
     },
     {
       name: 'Meditation',
@@ -136,7 +134,7 @@ const App: React.FC = () => {
         dateColumn: 'date',
         valueColumn: 'minutes'
       }),
-      color: '#8957e5'
+      color: 'purple'
     },
     {
       name: 'Reading',
@@ -145,7 +143,7 @@ const App: React.FC = () => {
         dateColumn: 'date',
         valueColumn: 'pages'
       }),
-      color: '#e34c26'
+      color: 'orange'
     },
     {
       name: 'Coding',
@@ -154,11 +152,9 @@ const App: React.FC = () => {
         dateColumn: 'date',
         valueColumn: 'commits'
       }),
-      color: '#f1e05a'
+      color: 'red'
     }
   ];
-
-  const habits = allHabits.filter(habit => activeHabits.includes(habit.name));
 
   const buttonStyle = {
     padding: '5px 12px',
@@ -174,14 +170,6 @@ const App: React.FC = () => {
   const selectStyle = {
     ...buttonStyle,
     marginLeft: '8px'
-  };
-
-  const toggleHabit = (habitName: string) => {
-    setActiveHabits(prev => 
-      prev.includes(habitName)
-        ? prev.filter(name => name !== habitName)
-        : [...prev, habitName]
-    );
   };
 
   return (
@@ -238,20 +226,6 @@ const App: React.FC = () => {
             </label>
           )}
 
-          <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
-            Shape:
-            <select 
-              value={shape} 
-              onChange={(e) => setShape(e.target.value as typeof shape)}
-              style={selectStyle}
-            >
-              <option value="triangle">Triangle</option>
-              <option value="square">Square</option>
-              <option value="hexagon">Hexagon</option>
-              <option value="octagon">Octagon</option>
-            </select>
-          </label>
-
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
             Size:
             <input
@@ -271,43 +245,8 @@ const App: React.FC = () => {
             habits={habits}
             dateRangeType={dateRangeType}
             year={year}
-            shape={shape}
             size={size}
           />
-        </div>
-
-        <div style={{ 
-          display: 'flex', 
-          gap: '24px', 
-          justifyContent: 'flex-start',
-          fontSize: '12px',
-          flexWrap: 'wrap'
-        }}>
-          {allHabits.map(habit => (
-            <div 
-              key={habit.name} 
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '4px',
-                cursor: 'pointer',
-                opacity: activeHabits.includes(habit.name) ? 1 : 0.5,
-                padding: '4px 8px',
-                borderRadius: '4px',
-                backgroundColor: activeHabits.includes(habit.name) ? 'rgba(27, 31, 35, 0.05)' : 'transparent'
-              }}
-              onClick={() => toggleHabit(habit.name)}
-            >
-              <div style={{ 
-                width: '12px', 
-                height: '12px', 
-                backgroundColor: habit.color,
-                border: '1px solid rgba(27, 31, 35, 0.06)',
-                borderRadius: '2px'
-              }} />
-              <span>{habit.name}</span>
-            </div>
-          ))}
         </div>
       </div>
     </div>

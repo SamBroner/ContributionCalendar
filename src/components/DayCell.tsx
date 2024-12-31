@@ -1,6 +1,23 @@
-import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { DayCellProps } from '../types';
+import React, { useState, useCallback } from 'react';
+import { format, isAfter, startOfDay, parseISO } from 'date-fns';
+import { DayCellProps, ColorScale, defaultColorScales } from '../types';
+import { Tooltip } from './Tooltip';
+
+const getColorForValue = (value: number, color: string | ColorScale): string => {
+  if (typeof color === 'string') {
+    if (color in defaultColorScales) {
+      color = defaultColorScales[color];
+    } else {
+      return value > 0 ? color : '#ebedf0';
+    }
+  }
+
+  if (value === 0) return color.empty;
+  if (value <= 3) return color.l1;
+  if (value <= 6) return color.l2;
+  if (value <= 9) return color.l3;
+  return color.l4;
+};
 
 export const DayCell: React.FC<DayCellProps> = ({
   date,
@@ -9,13 +26,36 @@ export const DayCell: React.FC<DayCellProps> = ({
   theme
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const formattedDate = format(new Date(date), 'MMM d, yyyy');
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    setTooltipPosition({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  // Parse the ISO date string properly
+  const cellDate = parseISO(date);
+  const today = startOfDay(new Date());
+  const isFutureDate = isAfter(cellDate, today);
+
+
+  const formattedDate = format(cellDate, 'MMM d, yyyy');
   const tooltipContent = segments
     .filter(s => s.value > 0)
     .map(s => `${s.habit.name}: ${s.value}`)
     .join('\n');
 
   const renderShape = () => {
+    // Return empty square for future dates
+    if (isFutureDate) {
+      return (
+        <rect
+          width={size}
+          height={size}
+          fill={theme.empty}
+        />
+      );
+    }
+
     const numSegments = segments.length;
 
     // Single habit - simple square
@@ -24,7 +64,7 @@ export const DayCell: React.FC<DayCellProps> = ({
         <rect
           width={size}
           height={size}
-          fill={segments[0].value > 0 ? segments[0].habit.color : theme.empty}
+          fill={getColorForValue(segments[0].value, segments[0].habit.color)}
         />
       );
     }
@@ -35,11 +75,11 @@ export const DayCell: React.FC<DayCellProps> = ({
         <>
           <path
             d={`M0,0 L${size},0 L${size},${size} L0,0`}
-            fill={segments[0].value > 0 ? segments[0].habit.color : theme.empty}
+            fill={getColorForValue(segments[0].value, segments[0].habit.color)}
           />
           <path
             d={`M0,0 L0,${size} L${size},${size} L0,0`}
-            fill={segments[1].value > 0 ? segments[1].habit.color : theme.empty}
+            fill={getColorForValue(segments[1].value, segments[1].habit.color)}
           />
         </>
       );
@@ -63,7 +103,7 @@ export const DayCell: React.FC<DayCellProps> = ({
               <path
                 key={i}
                 d={`M${center},${center} L${x1},${y1} A${radius},${radius} 0 0,1 ${x2},${y2} Z`}
-                fill={segment.value > 0 ? segment.habit.color : theme.empty}
+                fill={getColorForValue(segment.value, segment.habit.color)}
               />
             );
           })}
@@ -86,7 +126,7 @@ export const DayCell: React.FC<DayCellProps> = ({
                 y={y}
                 width={halfSize}
                 height={halfSize}
-                fill={segment.value > 0 ? segment.habit.color : theme.empty}
+                fill={getColorForValue(segment.value, segment.habit.color)}
               />
             );
           })}
@@ -112,7 +152,7 @@ export const DayCell: React.FC<DayCellProps> = ({
             <path
               key={i}
               d={`M${center},${center} L${x1},${y1} A${radius},${radius} 0 0,1 ${x2},${y2} Z`}
-              fill={segment.value > 0 ? segment.habit.color : theme.empty}
+              fill={getColorForValue(segment.value, segment.habit.color)}
             />
           );
         })}
@@ -127,8 +167,9 @@ export const DayCell: React.FC<DayCellProps> = ({
         width: size,
         height: size
       }}
-      onMouseEnter={() => setShowTooltip(true)}
+      onMouseEnter={() => !isFutureDate && setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
+      onMouseMove={handleMouseMove}
     >
       <svg
         width={size}
@@ -136,34 +177,27 @@ export const DayCell: React.FC<DayCellProps> = ({
         viewBox={`0 0 ${size} ${size}`}
         style={{
           border: '1px solid rgba(27, 31, 35, 0.06)',
-          borderRadius: '2px'
+          borderRadius: '2px',
+          position: 'relative',
+          zIndex: 1
         }}
       >
         {renderShape()}
       </svg>
 
-      {showTooltip && tooltipContent && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '100%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            marginBottom: '5px',
-            backgroundColor: theme.tooltip.background,
-            border: `1px solid ${theme.tooltip.border}`,
-            borderRadius: '3px',
-            padding: '8px',
-            zIndex: 1000,
-            whiteSpace: 'pre-line',
-            color: theme.tooltip.text,
-            fontSize: '11px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            pointerEvents: 'none'
-          }}
-        >
-          <div style={{ fontWeight: 600, marginBottom: '4px' }}>{formattedDate}</div>
-          {tooltipContent}
+      {showTooltip && tooltipContent && !isFutureDate && (
+        <div style={{ 
+          position: 'fixed',
+          left: tooltipPosition.x,
+          top: tooltipPosition.y,
+          pointerEvents: 'none',
+          zIndex: 10000 // Ensure tooltip is above everything
+        }}>
+          <Tooltip
+            date={formattedDate}
+            content={tooltipContent}
+            theme={theme}
+          />
         </div>
       )}
     </div>
