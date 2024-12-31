@@ -2,6 +2,17 @@
 
 A customizable React component that visualizes multi-habit tracking in a GitHub-like contribution calendar style. Instead of traditional squares, each day is represented by an n-sided shape split into slices, where each segment represents a different habit's contribution.
 
+![Habit Calendar showing 4 habits](image.png)
+![Habit Calendar with 5 habits](image-1.png)
+*The calendar displays multiple habits in a GitHub-style grid. Each day is split into segments representing different habits, with color intensity showing the level of activity.*
+
+## Features
+
+- Multiple habit tracking in a single, dense visualization
+- Flexible data source integration via plugins
+- Customizable appearance (colors, shapes, sizes)
+- Tooltip support for detailed daily information
+
 ## Installation
 
 ```bash
