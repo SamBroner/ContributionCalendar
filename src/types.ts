@@ -115,6 +115,7 @@ export type DateRangeType = 'calendar-year' | 'trailing-12-months';
 
 export interface HabitCalendarProps {
   habits: Habit[];
+  activeHabits: string[];
   dateRangeType?: DateRangeType;
   year?: number; // Only used when dateRangeType is 'calendar-year'
   shape?: ShapeType;
@@ -131,6 +132,19 @@ export interface DayCellProps {
     value: number;
   }>;
   theme: Theme;
+}
+
+export interface HabitToggleProps {
+  habit: Habit;
+  isActive: boolean;
+  onToggle: (habitName: string) => void;
+}
+
+export interface HabitTogglesProps {
+  habits: Habit[];
+  activeHabits: string[];
+  onToggle: (habitName: string) => void;
+  style?: React.CSSProperties;
 }
 
 export const defaultTheme: Theme = {

@@ -37,6 +37,8 @@ export const DayCell: React.FC<DayCellProps> = ({
   const today = startOfDay(new Date());
   const isFutureDate = isAfter(cellDate, today);
 
+  // Check if all habits are complete
+  const allHabitsComplete = segments.length > 0 && segments.every(s => s.value > 0);
 
   const formattedDate = format(cellDate, 'MMM d, yyyy');
   const tooltipContent = segments
@@ -176,10 +178,17 @@ export const DayCell: React.FC<DayCellProps> = ({
         height={size}
         viewBox={`0 0 ${size} ${size}`}
         style={{
-          border: '1px solid rgba(27, 31, 35, 0.06)',
+          border: allHabitsComplete 
+            ? '1px solid rgba(27, 31, 35, 0.06)'
+            : '1px solid transparent',
+
+          backgroundColor: allHabitsComplete ?
+            'rgba(27, 31, 35, 0.06)'
+            : undefined,
           borderRadius: '2px',
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          transition: 'all 0.2s ease-in-out'
         }}
       >
         {renderShape()}

@@ -1,160 +1,12 @@
 import React, { useState } from 'react';
-import { HabitCalendar, CSVAdapter, DateRangeType } from 'habit-contribution-calendar';
-
-// Example CSV data
-const runningData = `date,distance
-2023-01-01,5.2
-2023-01-02,3.1
-2023-02-15,4.5
-2023-03-20,6.2
-2023-04-10,3.8
-2023-05-05,5.0
-2023-06-15,4.2
-2023-07-20,6.5
-2023-08-10,3.9
-2023-09-05,5.3
-2023-10-15,4.7
-2023-11-20,6.1
-2023-12-10,3.5
-2024-01-01,5.2
-2024-01-02,3.1
-2024-01-03,0
-2024-01-04,6.5
-2024-01-05,4.2`;
-
-const writingData = `date,words
-2023-01-01,1200
-2023-02-01,800
-2023-03-15,1500
-2023-04-01,900
-2023-05-10,2000
-2023-06-01,1100
-2023-07-15,1800
-2023-08-01,950
-2023-09-10,2200
-2023-10-01,1300
-2023-11-15,1600
-2023-12-01,1000
-2024-01-01,1200
-2024-01-02,800
-2024-01-03,1500
-2024-01-04,0
-2024-01-05,2000`;
-
-const meditationData = `date,minutes
-2023-01-01,20
-2023-02-01,15
-2023-03-15,25
-2023-04-01,30
-2023-05-10,20
-2023-06-01,15
-2023-07-15,25
-2023-08-01,30
-2023-09-10,20
-2023-10-01,15
-2023-11-15,25
-2023-12-01,30
-2024-01-01,20
-2024-01-02,15
-2024-01-03,25
-2024-01-04,30
-2024-01-05,20`;
-
-const readingData = `date,pages
-2023-01-01,45
-2023-02-01,30
-2023-03-15,60
-2023-04-01,25
-2023-05-10,50
-2023-06-01,35
-2023-07-15,55
-2023-08-01,40
-2023-09-10,45
-2023-10-01,30
-2023-11-15,65
-2023-12-01,35
-2024-01-01,45
-2024-01-02,30
-2024-01-03,60
-2024-01-04,25
-2024-01-05,50`;
-
-const codingData = `date,commits
-2023-01-01,8
-2023-02-01,5
-2023-03-15,12
-2023-04-01,6
-2023-05-10,9
-2023-06-01,7
-2023-07-15,10
-2023-08-01,4
-2023-09-10,8
-2023-10-01,6
-2023-11-15,11
-2023-12-01,5
-2024-01-01,8
-2024-01-02,5
-2024-01-03,12
-2024-01-04,6
-2024-01-05,9`;
-
-const createBlobUrl = (content: string) => {
-  const blob = new Blob([content], { type: 'text/csv' });
-  return URL.createObjectURL(blob);
-};
+import { HabitCalendar, HabitToggles, DateRangeType } from 'habit-contribution-calendar';
+import { habits } from './demoData';
 
 const App: React.FC = () => {
   const [size, setSize] = useState(10);
   const [dateRangeType, setDateRangeType] = useState<DateRangeType>('calendar-year');
   const [year, setYear] = useState(new Date().getFullYear());
-
-  const habits = [
-    {
-      name: 'Running',
-      dataSource: new CSVAdapter({
-        file: createBlobUrl(runningData),
-        dateColumn: 'date',
-        valueColumn: 'distance'
-      }),
-      color: 'green'
-    },
-    {
-      name: 'Writing',
-      dataSource: new CSVAdapter({
-        file: createBlobUrl(writingData),
-        dateColumn: 'date',
-        valueColumn: 'words'
-      }),
-      color: 'blue'
-    },
-    {
-      name: 'Meditation',
-      dataSource: new CSVAdapter({
-        file: createBlobUrl(meditationData),
-        dateColumn: 'date',
-        valueColumn: 'minutes'
-      }),
-      color: 'purple'
-    },
-    {
-      name: 'Reading',
-      dataSource: new CSVAdapter({
-        file: createBlobUrl(readingData),
-        dateColumn: 'date',
-        valueColumn: 'pages'
-      }),
-      color: 'orange'
-    },
-    {
-      name: 'Coding',
-      dataSource: new CSVAdapter({
-        file: createBlobUrl(codingData),
-        dateColumn: 'date',
-        valueColumn: 'commits'
-      }),
-      color: 'red'
-    }
-  ];
+  const [activeHabits, setActiveHabits] = useState<string[]>(habits.map(h => h.name));
 
   const buttonStyle = {
     padding: '5px 12px',
@@ -172,13 +24,22 @@ const App: React.FC = () => {
     marginLeft: '8px'
   };
 
+  const toggleHabit = (habitName: string) => {
+    setActiveHabits(prev => 
+      prev.includes(habitName)
+        ? prev.filter(name => name !== habitName)
+        : [...prev, habitName]
+    );
+  };
+
   return (
     <div style={{ 
       display: 'flex', 
       flexDirection: 'column', 
       gap: '24px',
       padding: '24px',
-      maxWidth: '1012px',
+      width: '95%',
+      maxWidth: '1200px',
       margin: '0 auto',
       color: '#24292f',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif'
@@ -187,10 +48,13 @@ const App: React.FC = () => {
         display: 'flex', 
         flexDirection: 'column', 
         gap: '16px',
-        padding: '16px',
+        padding: '24px',
         backgroundColor: '#ffffff',
         border: '1px solid #d0d7de',
-        borderRadius: '6px'
+        borderRadius: '6px',
+        width: '100%',
+        boxSizing: 'border-box',
+        overflow: 'auto'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -198,56 +62,82 @@ const App: React.FC = () => {
           alignItems: 'center', 
           flexWrap: 'wrap',
           padding: '0 0 16px',
-          borderBottom: '1px solid #d0d7de'
+          borderBottom: '1px solid #d0d7de',
+          width: '100%'
         }}>
-          <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
-            View Type:
-            <select 
-              value={dateRangeType} 
-              onChange={(e) => setDateRangeType(e.target.value as DateRangeType)}
-              style={selectStyle}
-            >
-              <option value="calendar-year">Calendar Year</option>
-              <option value="trailing-12-months">Trailing 12 Months</option>
-            </select>
-          </label>
-
-          {dateRangeType === 'calendar-year' && (
+          <div style={{
+            display: 'flex',
+            gap: '16px',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            width: '100%'
+          }}>
             <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
-              Year:
-              <select
-                value={year}
-                onChange={(e) => setYear(Number(e.target.value))}
+              View Type:
+              <select 
+                value={dateRangeType} 
+                onChange={(e) => setDateRangeType(e.target.value as DateRangeType)}
                 style={selectStyle}
               >
-                <option value="2023">2023</option>
-                <option value="2024">2024</option>
+                <option value="calendar-year">Calendar Year</option>
+                <option value="trailing-12-months">Trailing 12 Months</option>
               </select>
             </label>
-          )}
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-            Size:
-            <input
-              type="range"
-              min="8"
-              max="16"
-              value={size}
-              onChange={(e) => setSize(Number(e.target.value))}
-              style={{ verticalAlign: 'middle' }}
-            />
-            {size}px
-          </label>
+            {dateRangeType === 'calendar-year' && (
+              <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
+                Year:
+                <select
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                  style={selectStyle}
+                >
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                </select>
+              </label>
+            )}
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+              Size:
+              <input
+                type="range"
+                min="8"
+                max="16"
+                value={size}
+                onChange={(e) => setSize(Number(e.target.value))}
+                style={{ verticalAlign: 'middle' }}
+              />
+              {size}px
+            </label>
+          </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ 
+          width: '100%',
+          overflowX: 'auto',
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
           <HabitCalendar
             habits={habits}
+            activeHabits={activeHabits}
             dateRangeType={dateRangeType}
             year={year}
             size={size}
           />
         </div>
+
+        <HabitToggles
+          habits={habits}
+          activeHabits={activeHabits}
+          onToggle={toggleHabit}
+          style={{
+            padding: '16px 0 0',
+            borderTop: '1px solid #d0d7de',
+            justifyContent: 'center'
+          }}
+        />
       </div>
     </div>
   );

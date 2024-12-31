@@ -5,23 +5,56 @@ import {
   subMonths,
   startOfDay,
   endOfDay,
-  eachDayOfInterval,
   format,
   isWithinInterval,
   getMonth,
   startOfWeek,
-  addWeeks,
   isSameMonth
 } from 'date-fns';
 import { HabitCalendarProps, DayData, defaultTheme } from '../types';
 import { DayCell } from './DayCell';
-import { HabitToggle } from './HabitToggle';
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+/**
+ * HabitCalendar displays a GitHub-style contribution calendar for multiple habits.
+ * Each day is represented by a shape divided into segments, one for each habit.
+ * The intensity of each segment's color represents the value for that habit on that day.
+ * 
+ * The calendar automatically adjusts its shape based on the number of active habits:
+ * - 1 habit: Square
+ * - 2 habits: Diagonal split square
+ * - 3 habits: Hexagon with three segments
+ * - 4 habits: Square split into four
+ * - 5+ habits: Radial segments
+ * 
+ * @example
+ * ```tsx
+ * <HabitCalendar
+ *   habits={[
+ *     {
+ *       name: 'Running',
+ *       dataSource: new CSVAdapter(...),
+ *       color: 'red'
+ *     },
+ *     {
+ *       name: 'Writing',
+ *       dataSource: new CSVAdapter(...),
+ *       color: 'blue'
+ *     }
+ *   ]}
+ *   activeHabits={['Running', 'Writing']}
+ *   dateRangeType="calendar-year"
+ *   year={2024}
+ *   size={12}
+ *   gap={2}
+ * />
+ * ```
+ */
 export const HabitCalendar: React.FC<HabitCalendarProps> = ({
   habits: allHabits,
+  activeHabits,
   dateRangeType = 'calendar-year',
   year = new Date().getFullYear(),
   size = 10,
@@ -30,7 +63,6 @@ export const HabitCalendar: React.FC<HabitCalendarProps> = ({
 }) => {
   const [habitData, setHabitData] = useState<Map<string, Map<string, DayData>>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [activeHabits, setActiveHabits] = useState<string[]>(allHabits.map(h => h.name));
 
   const habits = allHabits.filter(habit => activeHabits.includes(habit.name));
 
@@ -74,14 +106,6 @@ export const HabitCalendar: React.FC<HabitCalendarProps> = ({
 
     fetchData();
   }, [allHabits, dateRangeType, year]);
-
-  const toggleHabit = (habitName: string) => {
-    setActiveHabits(prev => 
-      prev.includes(habitName)
-        ? prev.filter(name => name !== habitName)
-        : [...prev, habitName]
-    );
-  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -192,24 +216,6 @@ export const HabitCalendar: React.FC<HabitCalendarProps> = ({
             )}
           </div>
         </div>
-      </div>
-
-      {/* Habit toggles */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '24px', 
-        justifyContent: 'flex-start',
-        flexWrap: 'wrap',
-        paddingLeft: 32
-      }}>
-        {allHabits.map(habit => (
-          <HabitToggle
-            key={habit.name}
-            habit={habit}
-            isActive={activeHabits.includes(habit.name)}
-            onToggle={toggleHabit}
-          />
-        ))}
       </div>
     </div>
   );

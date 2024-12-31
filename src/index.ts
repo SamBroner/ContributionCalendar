@@ -1,4 +1,5 @@
 export { HabitCalendar } from './components/HabitCalendar';
+export { HabitToggles } from './components/HabitToggles';
 export { CSVAdapter } from './adapters/csv';
 export { BaseAdapter } from './adapters/base';
 export type {
@@ -9,5 +10,7 @@ export type {
   ShapeType,
   DateRangeType,
   HabitCalendarProps,
-  DayCellProps
+  DayCellProps,
+  HabitToggleProps,
+  HabitTogglesProps
 } from './types'; 

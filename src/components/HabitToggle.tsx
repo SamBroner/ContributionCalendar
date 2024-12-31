@@ -1,12 +1,11 @@
 import React from 'react';
-import { Habit, ColorScale, defaultColorScales } from '../types';
+import { Habit, ColorScale, defaultColorScales, HabitToggleProps } from '../types';
 
-interface HabitToggleProps {
-  habit: Habit;
-  isActive: boolean;
-  onToggle: (habitName: string) => void;
-}
-
+/**
+ * Gets a ColorScale object from either a predefined color name or a custom ColorScale object.
+ * If a string is provided and it matches a predefined scale, that scale is used.
+ * Otherwise, creates a single-color scale using the provided color.
+ */
 const getColorScale = (color: string | ColorScale): ColorScale => {
   if (typeof color === 'string') {
     return color in defaultColorScales ? defaultColorScales[color] : {
@@ -20,6 +19,24 @@ const getColorScale = (color: string | ColorScale): ColorScale => {
   return color;
 };
 
+/**
+ * HabitToggle is a single toggle button for a habit.
+ * Shows the habit's name and a preview of its color scale.
+ * When clicked, toggles the habit's visibility in the calendar.
+ * 
+ * @example
+ * ```tsx
+ * <HabitToggle
+ *   habit={{
+ *     name: 'Running',
+ *     color: 'red',
+ *     dataSource: new CSVAdapter(...)
+ *   }}
+ *   isActive={true}
+ *   onToggle={(name) => console.log(`Toggle ${name}`)}
+ * />
+ * ```
+ */
 export const HabitToggle: React.FC<HabitToggleProps> = ({
   habit,
   isActive,
